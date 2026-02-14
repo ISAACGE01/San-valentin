@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Pilar ❤️</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&family=Dancing+Script:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- SweetAlert2 for nice alerts if needed, optional but good for debug -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <!-- 
+      Z-INDEX LAYERS:
+      0: Background
+      1: Hearts (Pointer Events NONE)
+      100: Content
+      1000: Interactive Elements (Buttons)
+    -->
+
+    <!-- Floating Hearts Background -->
+    <div class="hearts-container" id="heartsContainer"></div>
+
+    <!-- Music Control -->
+    <div class="music-control" id="musicControl">
+        <button id="musicToggle" class="music-btn" aria-label="Toggle Music">
+            <span class="play-icon">▶</span>
+            <span class="pause-icon" style="display: none;">⏸</span>
+        </button>
+        <audio id="backgroundMusic" loop>
+            <source src="assets/music/tu-refugio.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- Section 1: Home/Cover -->
+    <section class="section cover-section active" id="coverSection">
+        <div class="cover-content">
+            <!-- Envelope Container -->
+            <div class="envelope-wrapper">
+                <div class="envelope" id="envelope">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-body">
+                        <div class="heart-icon">❤️</div>
+                    </div>
+                    <!-- The letter paper that slides out -->
+                    <div class="paper">
+                        <div class="paper-content">Te amo❤️</div>
+                    </div>
+                </div>
+            </div>
+
+            <h1 class="cover-title">Para Pilar</h1>
+
+            <!-- START BUTTON - SEPARATED FROM ENVELOPE FOR CLICKABILITY -->
+            <div class="action-container">
+                <button class="open-btn" id="openBtn" onclick="startExperience()">Ábreme</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Welcome Message -->
+    <section class="section welcome-section" id="welcomeSection">
+        <div class="container">
+            <div class="welcome-content glass-card">
+                <p class="welcome-text" id="welcomeText">
+                    <!-- Typewriter fills this -->
+                </p>
+                <div class="button-group">
+                    <button class="back-btn" id="backBtn1">‹ Volver</button>
+                    <button class="continue-btn" id="continueBtn1">Continuar ❤️</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Countdown -->
+    <section class="section countdown-section" id="countdownSection">
+        <div class="container">
+            <h2 class="section-title">Nuestro Momento Especial</h2>
+            <div class="countdown-container glass-card">
+                <div class="countdown-text">Faltan</div>
+                <div class="countdown-timer">
+                    <div class="time-unit">
+                        <span class="time-value" id="days">00</span>
+                        <span class="time-label">Días</span>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="hours">00</span>
+                        <span class="time-label">Horas</span>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="minutes">00</span>
+                        <span class="time-label">Minutos</span>
+                    </div>
+                    <div class="time-separator">:</div>
+                    <div class="time-unit">
+                        <span class="time-value" id="seconds">00</span>
+                        <span class="time-label">Segundos</span>
+                    </div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="back-btn" id="backBtn2">‹ Volver</button>
+                <button class="continue-btn" id="continueBtn2">Continuar ❤️</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Secrets (Interactive Cards) -->
+    <section class="section secrets-section" id="secretsSection">
+        <div class="container">
+            <h2 class="section-title">Lo que amo de ti</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <span>❤️</span>
+                            <p>Toca para ver</p>
+                        </div>
+                        <div class="card-back">
+                            <p>Tu sonrisa que ilumina mis días más oscuros.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <span>✨</span>
+                            <p>Toca para ver</p>
+                        </div>
+                        <div class="card-back">
+                            <p>La forma en que me haces sentir capaz de todo.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <span>🌹</span>
+                            <p>Toca para ver</p>
+                        </div>
+                        <div class="card-back">
+                            <p>Tu bondad y la pureza de tu corazón.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="back-btn" id="backBtn3">‹ Volver</button>
+                <button class="continue-btn" id="continueBtn3">Continuar ❤️</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Gallery -->
+    <section class="section gallery-section" id="gallerySection">
+        <div class="gallery-container">
+            <!-- Full screen immersive gallery -->
+            <div class="gallery-carousel" id="galleryCarousel">
+                <!-- Items injected by JS -->
+            </div>
+
+            <button class="gallery-nav prev" id="prevBtn">❮</button>
+            <button class="gallery-nav next" id="nextBtn">❯</button>
+
+            <div class="gallery-overlay-ui">
+                <div class="button-group">
+                    <button class="back-btn" id="backBtn4">‹ Volver</button>
+                    <!-- Hide until unlocked -->
+                    <button class="continue-btn locked" id="continueBtn4">Continuar ❤️</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Letter (Book) -->
+    <section class="section letter-section" id="letterSection">
+        <div class="container">
+            <h2 class="section-title">Una Carta Para Ti</h2>
+            <div class="book-container">
+                <div class="book">
+                    <div class="book-cover">
+                        <h3>Abre para leer...</h3>
+                    </div>
+                    <div class="book-page">
+                        <p>
+                            Desde que llegaste a mi vida,<br>
+                            todo tiene más color.<br>
+                            Cada momento a tu lado es un tesoro<br>
+                            que guardo en mi corazón.
+                        </p>
+                    </div>
+                </div>
+                <!-- Second page/book for animation -->
+                <div class="second-book" style="display: none;">
+                    <div class="book-page">
+                        <p>
+                            Eres mi niña, mi amor,<br>
+                            y mi mejor amiga.<br>
+                            No puedo esperar a seguir escribiendo<br>
+                            esta historia juntos.<br>
+                            <span style="font-size: 1.5rem; display: block; margin-top: 10px;">TE AMO❤️!!</span>
+                        </p>
+                    </div>
+                    <div class="book-cover-back">
+                        <!-- Back cover content can be empty or a pattern -->
+                    </div>
+                </div>
+            </div>
+            <button class="page-turn-btn" id="pageTurnBtn">Voltear página ›</button>
+            <div class="button-group">
+                <button class="back-btn" id="backBtn5">‹ Volver</button>
+                <button class="continue-btn" id="continueBtn5">Continuar ❤️</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: Invitation (Functionality) -->
+    <section class="section invitation-section" id="invitationSection">
+        <div class="container">
+            <h2 class="section-title">Una Pregunta...</h2>
+            <div class="invitation-card glass-card">
+                <p class="invitation-text">
+                    ¿Me harías el honor de ser mi San Valentín?
+                </p>
+                <button class="confirm-btn" id="confirmBtn">¡Sí, acepto! 💖</button>
+            </div>
+            <div class="button-group">
+                <button class="back-btn" id="backBtn6">‹ Volver</button>
+                <button class="continue-btn" id="continueBtn6">Final ✨</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 8: Final/Credits -->
+    <section class="section final-section" id="finalSection">
+        <div class="container">
+            <div class="final-content glass-card">
+                <h2 class="giant-love" id="giantLove">Te quiero</h2>
+                <p class="final-message">
+                    Peque, esto lo he hecho para ti.<br>
+                    Porque mereces algo tan especial como tú.
+                </p>
+                <p class="final-signature">
+                    Con todo mi amor,<br>
+                    <span class="signature-name">Isaac ❤️</span>
+                </p>
+                <button class="restart-btn" id="restartBtn">Volver al inicio</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <span class="close-modal" id="modalCloseBtn">&times;</span>
+            <div class="modal-body">
+                <h3>¡Confirmado! ✅</h3>
+                <p>Pilar ha confirmado su asistencia a la cita más especial del año.</p>
+                <p class="modal-emoji">❤️💕✨</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script at the end -->
+    <script src="script.js"></script>
+</body>
+
+</html>

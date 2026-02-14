@@ -1,0 +1,835 @@
+/* ========================================
+   1. RESET & VARIABLES
+   ======================================== */
+:root {
+    /* Colors */
+    --primary-color: #ff6b9d;
+    --secondary-color: #ff9a8b;
+    --bg-dark: #2c0e18;
+    --text-color: #333;
+    --light-text: #fff;
+    --card-bg: rgba(255, 255, 255, 0.95);
+
+    /* Shadows & Effects */
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.15);
+    --shadow-glow: 0 0 20px rgba(255, 107, 157, 0.6);
+    --gradient-romantic: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+    --blur-glass: blur(10px);
+
+    /* Fonts */
+    --font-heading: 'Playfair Display', serif;
+    --font-primary: 'Poppins', sans-serif;
+    --font-script: 'Dancing Script', cursive;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    /* Remove blue highlight on mobile tap */
+}
+
+body {
+    font-family: var(--font-primary);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    /* Sections handle their own scroll if needed */
+    background: linear-gradient(135deg, #2b1055, #7597de);
+    color: var(--text-color);
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ========================================
+   2. Z-INDEX SYSTEM (CRITICAL)
+   ======================================== */
+.hearts-container {
+    z-index: 1;
+    pointer-events: none;
+}
+
+.section {
+    z-index: 100;
+}
+
+.music-control {
+    z-index: 2000;
+}
+
+.modal {
+    z-index: 9999;
+}
+
+/* Interactive elements layer override */
+.open-btn,
+.continue-btn,
+.back-btn,
+.music-btn,
+.restart-btn {
+    position: relative;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+/* ========================================
+   3. SHARED COMPONENTS
+   ======================================== */
+/* Buttons */
+button {
+    border: none;
+    outline: none;
+}
+
+.open-btn {
+    padding: 1.2rem 3rem;
+    font-size: 1.5rem;
+    font-family: var(--font-primary);
+    font-weight: 600;
+    background: var(--gradient-romantic);
+    border-radius: 50px;
+    color: #fff;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.open-btn:active {
+    transform: scale(0.95);
+}
+
+.continue-btn {
+    background: #ff6b9d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.continue-btn.locked {
+    display: none;
+}
+
+/* Glass Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: var(--blur-glass);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    color: white;
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+/* Sections - FIXED VISIBILITY LOGIC */
+.section {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    /* KEY FIX: Remove from layout when not active */
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow-y: auto;
+    /* Allow scrolling within section */
+    padding: 20px 0;
+    /* Add top/bottom padding for scroll space */
+}
+
+.section.active {
+    display: flex;
+    /* Only show active */
+    animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: auto;
+    /* Ensure content fits */
+    flex-shrink: 0;
+}
+
+/* ========================================
+   4. SPECIFIC SECTIONS
+   ======================================== */
+
+/* COVER SECTION */
+.cover-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.cover-title {
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 107, 157, 0.8);
+    margin: 1rem 0;
+}
+
+/* Envelope Container - Separated from button */
+.envelope-wrapper {
+    perspective: 1000px;
+    margin-bottom: 2rem;
+}
+
+.envelope {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    background: #ff4d6d;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    /* 3D Transform only on envelope, not impacting button siblings */
+    transform-style: preserve-3d;
+}
+
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 110px solid #ff758f;
+    /* Lighter color */
+    transform-origin: top;
+    transition: transform 0.6s ease-in-out;
+    z-index: 5;
+}
+
+.envelope-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 0 0 10px 10px;
+    background: #ff4d6d;
+    z-index: 4;
+}
+
+.heart-icon {
+    font-size: 4rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    /* On top of flap initially, or below? */
+    /* Adjust z-index: flap is 5. Heart should be inside or on top? */
+    /* Let's keep it simple: Heart is decoration */
+}
+
+/* Paper Animation */
+.paper {
+    position: absolute;
+    width: 260px;
+    height: 160px;
+    background: white;
+    bottom: 10px;
+    left: 20px;
+    border-radius: 5px;
+    transition: transform 1s ease 0.5s;
+    /* Delay start */
+    transform: translateY(0);
+    /* Hidden inside */
+    z-index: 3;
+    /* Behind body, below flap */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-script);
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+/* Envelope Open State */
+.envelope.open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+    /* Move flap behind everything */
+}
+
+.envelope.open .paper {
+    transform: translateY(-100px);
+    /* Slide Up */
+    z-index: 6;
+    /* Move in front of body */
+}
+
+/* ========================================
+   VISUAL POLISH UPDATES
+   ======================================== */
+
+/* TITLES - Resizing */
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    /* Reduced from 3.5rem */
+    color: #ffcae5;
+    /* Soft pink-white */
+    text-shadow: 0 0 10px rgba(255, 107, 157, 0.8), 2px 2px 0px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1rem;
+    /* Less margin */
+    text-align: center;
+}
+
+/* BOOK INTERACTION - WIDER & FLUID */
+.book-container {
+    perspective: 1500px;
+    width: 85vw;
+    max-width: 400px;
+    /* Reduced max-width slightly */
+    height: 45vh;
+    /* Reduced from 60vh to make it smaller/less empty vert space */
+    max-height: 400px;
+    margin: 10px auto;
+    /* Less margin */
+    position: relative;
+    cursor: pointer;
+}
+
+.book,
+.second-book {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    display: flex;
+}
+
+.book-cover,
+.book-page,
+.book-cover-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem 1rem;
+    /* Compact padding */
+    box-shadow: inset 5px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* FLOATING HEARTS (Transparent) */
+.hearts-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.floating-heart {
+    position: absolute;
+    bottom: -50px;
+    background: transparent;
+    /* REMOVED BACKGROUND */
+    font-size: 2.5rem;
+    animation: floatUp linear infinite;
+    text-shadow: 0 0 5px rgba(255, 107, 157, 0.5);
+    z-index: 1;
+}
+
+.floating-heart::after {
+    content: '❤️';
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(0.5);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-120vh) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* COUNTDOWN VISIBILITY - HORIZONTAL & RESPONSIVE */
+.countdown-container {
+    background: rgba(0, 0, 0, 0.6);
+    /* Slightly darker for readability */
+    border: 2px solid rgba(255, 107, 157, 0.5);
+    box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+    padding: 2rem 1rem;
+    border-radius: 15px;
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+.countdown-timer {
+    display: flex;
+    flex-direction: row;
+    /* Horizontal alignment */
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    /* Space between units */
+    flex-wrap: wrap;
+    /* Allow wrap on very small screens */
+}
+
+.time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-width: 60px;
+}
+
+.time-separator {
+    font-size: 3rem;
+    color: white;
+    margin-top: -10px;
+    /* Align with numbers */
+    display: block;
+    /* Show on desktop */
+}
+
+.time-value {
+    font-size: 3rem;
+    /* Adjusted for mobile fit */
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 107, 157, 1);
+    line-height: 1;
+}
+
+.time-label {
+    font-size: 0.9rem;
+    color: #ffd1dc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 5px;
+}
+
+/* GALLERY (Fixed Size) */
+.gallery-section {
+    background: black;
+    /* Immersive */
+    padding: 20px 0;
+}
+
+.gallery-container {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    /* Fixed height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-carousel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* Hide others */
+    position: relative;
+}
+
+.gallery-item {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gallery-item.active {
+    opacity: 1;
+    z-index: 10;
+}
+
+.gallery-item img,
+.gallery-item video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 2rem;
+    padding: 10px 15px;
+    cursor: pointer;
+    z-index: 20;
+    border-radius: 5px;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+
+.gallery-overlay-ui {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    /* Allow clicks to pass through to video controls */
+}
+
+.gallery-overlay-ui .button-group {
+    pointer-events: auto;
+    /* Re-enable clicks for buttons */
+    background: rgba(0, 0, 0, 0.5);
+    /* Optional: background for buttons to stand out */
+    padding: 10px;
+    border-radius: 20px;
+}
+
+/* Music Control */
+.music-control {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+
+.music-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    color: white;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Secrets Cards - MOBILE FIX */
+.cards-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.card {
+    perspective: 1000px;
+    width: 140px;
+    /* Slightly smaller for mobile */
+    height: 180px;
+    cursor: pointer;
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 380px) {
+    .card {
+        width: 100%;
+        /* Full width on tiny screens? Or just smaller grid */
+        max-width: 200px;
+        height: 150px;
+    }
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.card:active .card-inner,
+.card:hover .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-shadow: var(--shadow-sm);
+}
+
+.card-front {
+    background: white;
+    color: var(--primary-color);
+}
+
+.card-back {
+    background: var(--secondary-color);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+/* BOOK INTERACTION - WIDER & FLUID */
+.book-container {
+    perspective: 1500px;
+    width: 85vw;
+    /* Responsive Width */
+    max-width: 450px;
+    /* Cap width */
+    height: 60vh;
+    /* Responsive Height */
+    max-height: 550px;
+    margin: 20px auto;
+    position: relative;
+    cursor: pointer;
+}
+
+.book,
+.second-book {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    display: flex;
+}
+
+.book-cover,
+.book-page,
+.book-cover-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 5px;
+    padding: 3rem 2rem;
+    /* More padding */
+    box-shadow: inset 5px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.book-cover {
+    background: linear-gradient(45deg, #8e44ad, #c0392b);
+    color: white;
+    z-index: 2;
+    font-family: var(--font-heading);
+    border: 2px solid #f1c40f;
+    /* Gold border */
+}
+
+.book-cover h3 {
+    color: #f1c40f;
+    font-size: 1.8rem;
+    /* Smaller from 2.5rem */
+}
+
+.book-page {
+    background: #fffbf0;
+    color: #333;
+    z-index: 1;
+    font-family: var(--font-script);
+    font-size: 1.2rem;
+}
+
+/* Ensure text is readable and "Justified" (balanced) */
+.book-page p {
+    font-size: 1.1rem;
+    /* Smaller as requested */
+    line-height: 1.8;
+    color: #2c3e50;
+    font-weight: 600;
+    text-align: center;
+    /* Center is better for poems/letters than full justify */
+    width: 100%;
+    margin-top: 1rem;
+    /* "Más abajo" */
+    padding: 0 1rem;
+    /* Prevent touching edges */
+}
+
+/* Hide separators on small mobile screens to prevent clutter */
+@media (max-width: 480px) {
+    .time-separator {
+        display: none;
+    }
+
+    .countdown-timer {
+        gap: 1rem;
+        justify-content: space-around;
+        /* Spread out */
+    }
+
+    .time-value {
+        font-size: 2.5rem;
+    }
+}
+
+.page-turn-btn {
+    background: white;
+    color: var(--primary-color);
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin: 10px auto;
+    display: block;
+    cursor: pointer;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+/* INVITATION REDESIGN (Penultimate Page) */
+.invitation-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 230, 230, 0.95));
+    border: 3px solid #ff6b9d;
+    padding: 4rem 2rem;
+    max-width: 700px;
+    transform: rotate(-2deg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.invitation-text {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    color: #d6336c;
+    margin-bottom: 3rem;
+}
+
+.confirm-btn {
+    font-size: 1.8rem;
+    padding: 1rem 3rem;
+    background: #ff4d6d;
+    color: white;
+    border-radius: 50px;
+    box-shadow: 0 10px 20px rgba(255, 77, 109, 0.4);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.confirm-btn:hover {
+    transform: scale(1.1) rotate(2deg);
+}
+
+/* FINAL SECTION Buttons */
+.final-content .restart-btn {
+    margin-top: 2rem;
+    background: white;
+    color: var(--primary-color);
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .cover-title {
+        font-size: 3rem;
+    }
+
+    .gallery-container {
+        height: 70vh;
+    }
+}
